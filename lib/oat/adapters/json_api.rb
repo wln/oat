@@ -73,6 +73,17 @@ module Oat
         end
       end
 
+      def entity_typed(name, obj, serializer_class = nil, context_options = {}, &block)
+        ent = serializer_from_block_or_class(obj, serializer_class, context_options, &block)
+        if ent
+          ent_hash = ent.to_hash
+          entity_hash[ent.types.first.to_s.pluralize.to_sym] ||= []
+          data[:links][name] = ent_hash[:id]
+          entity_hash[ent.types.first.to_s.pluralize.to_sym] << ent_hash
+        end
+      end
+
+
       def entities(name, collection, serializer_class = nil, context_options = {}, &block)
         return if collection.nil? || collection.empty?
         link_name = name.to_s.pluralize.to_sym
@@ -85,6 +96,23 @@ module Oat
             ent_hash = ent.to_hash
             data[:links][link_name] << ent_hash[:id]
             entity_hash[link_name] << ent_hash
+          end
+        end
+      end
+      
+      def entities_typed(name, collection, serializer_class = nil, context_options = {}, &block)
+        return if collection.nil? || collection.empty?
+        link_name = name.to_s.pluralize.to_sym
+        data[:links][link_name] = []
+
+        collection.each do |obj|
+          # entity_hash[link_name] ||= []
+          ent = serializer_from_block_or_class(obj, serializer_class, context_options, &block)
+          if ent
+            ent_hash = ent.to_hash
+            data[:links][link_name] << ent_hash[:id]
+            entity_hash[ent.types.first.to_s.pluralize.to_sym] ||= []
+            entity_hash[ent.types.first.to_s.pluralize.to_sym] << ent_hash
           end
         end
       end

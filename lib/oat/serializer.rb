@@ -18,7 +18,7 @@ module Oat
       logger ? logger.warning(msg) : Kernel.warn(msg)
     end
 
-    attr_reader :item, :context, :adapter_class, :adapter
+    attr_reader :item, :context, :adapter_class, :adapter, :types
 
     def initialize(item, context = {}, _adapter_class = nil, parent_serializer = nil)
       @item, @context = item, context
@@ -43,6 +43,7 @@ module Oat
       if adapter.respond_to?(:type) && adapter.method(:type).arity != 0
         adapter.type(*args)
       end
+      @types = args
     end
 
     def respond_to_missing?(method_name, include_private = false)
