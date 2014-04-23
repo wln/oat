@@ -110,9 +110,21 @@ module Oat
           else
             h[root_name] = [data]
           end
-          h[:linked] = @entities if @entities.keys.any?
+          h[:linked] = uniq_entities if @entities.keys.any?
           h[:links] = @link_templates if @link_templates.keys.any?
           return h
+        end
+      end
+
+      def uniq_entities
+        Hash[@entities.map{|k,v| [k, uniq_entity_values(v)]}]
+      end
+      
+      def uniq_entity_values(v)
+        if v.all?{|o| o[:id].present?}
+          v.sort_by{|o| o[:id]}.uniq{|o| o[:id]}
+        else
+          v
         end
       end
 
