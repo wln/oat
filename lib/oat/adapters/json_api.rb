@@ -26,7 +26,11 @@ module Oat
         if opts.is_a?(Hash)
           templated = opts.delete(:templated)
           if templated
-            link_template(rel, opts[:href])
+            if opts.except(:href).present?
+              link_template(rel, opts)
+            else
+              link_template(rel, opts[:href])
+            end
           else
             check_link_keys(opts)
           end
